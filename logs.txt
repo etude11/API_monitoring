@@ -1,0 +1,269 @@
+2025-02-20 10:00:01 Service API-Gateway received request: GET /products/345 from 172.16.0.10
+2025-02-20 10:00:02 Service Product-Service retrieving details for productID=345
+2025-02-20 10:00:03 Service Product-Service response time: 120ms, status: 200
+2025-02-20 10:00:04 Service API-Gateway response sent for GET /products/345, status: 200, time: 180ms
+
+2025-02-20 10:05:15 Service API-Gateway received request: POST /checkout from 172.16.0.12
+2025-02-20 10:05:16 Service Auth-Service validating JWT token for userID=567
+2025-02-20 10:05:16 Service Auth-Service token validation successful
+2025-02-20 10:05:17 Service Order-Service processing order for userID=567
+2025-02-20 10:05:18 Service Order-Service order placed successfully, orderID=9876
+2025-02-20 10:05:19 Service API-Gateway response sent for POST /checkout, status: 201, time: 400ms
+
+2025-02-20 10:10:30 Service API-Gateway received request: DELETE /wishlist/999 from 172.16.0.15
+2025-02-20 10:10:31 Service Auth-Service validating JWT token for userID=789
+2025-02-20 10:10:31 Service Auth-Service token validation failed: Invalid token
+2025-02-20 10:10:32 Service API-Gateway response sent for DELETE /wishlist/999, status: 403, time: 50ms
+
+2025-02-20 10:15:45 Service API-Gateway received request: GET /analytics/traffic from 172.16.0.20
+2025-02-20 10:15:46 Service Analytics-Service generating traffic data for last 24 hours
+2025-02-20 10:15:47 Service Analytics-Service response time: 800ms, status: 200
+2025-02-20 10:15:48 Service API-Gateway response sent for GET /analytics/traffic, status: 200, time: 850ms
+
+2025-02-20 10:20:55 Service API-Gateway received request: POST /users/signup from 172.16.0.22
+2025-02-20 10:20:56 Service User-Service validating new user details
+2025-02-20 10:20:57 Service User-Service user registration successful, userID=1234
+2025-02-20 10:20:58 Service API-Gateway response sent for POST /users/signup, status: 201, time: 350ms
+
+2025-02-20 10:30:01 Service API-Gateway received request: PUT /profile/update from 172.16.0.25
+2025-02-20 10:30:02 Service Auth-Service validating JWT token for userID=543
+2025-02-20 10:30:02 Service Auth-Service token validation successful
+2025-02-20 10:30:03 Service User-Service updating profile for userID=543
+2025-02-20 10:30:04 Service User-Service database update query executed in 200ms
+2025-02-20 10:30:05 Service API-Gateway response sent for PUT /profile/update, status: 200, time: 260ms
+
+2025-02-20 10:45:10 Service API-Gateway received request: PATCH /payments/update/567 from 172.16.0.30
+2025-02-20 10:45:11 Service Auth-Service validating JWT token for userID=321
+2025-02-20 10:45:11 Service Auth-Service token validation successful
+2025-02-20 10:45:12 Service Payment-Service updating payment details for transactionID=567
+2025-02-20 10:45:13 Service Payment-Service update successful, new status: Completed
+2025-02-20 10:45:14 Service API-Gateway response sent for PATCH /payments/update/567, status: 200, time: 400ms
+
+2025-02-20 11:00:20 Service API-Gateway received request: GET /server/status from 172.16.0.35
+2025-02-20 11:00:21 Service Monitoring-Service fetching server health metrics
+2025-02-20 11:00:22 Service Monitoring-Service response: CPU 45%, Memory 62%, Disk 80%
+2025-02-20 11:00:23 Service API-Gateway response sent for GET /server/status, status: 200, time: 250ms
+
+2025-02-20 11:15:30 Service API-Gateway received request: GET /settings from 172.16.0.40
+2025-02-20 11:15:31 Service User-Service fetching settings for userID=999
+2025-02-20 11:15:32 Service User-Service response time: 130ms, status: 200
+2025-02-20 11:15:33 Service API-Gateway response sent for GET /settings, status: 200, time: 180ms
+
+2025-02-20 11:30:45 Service API-Gateway received request: GET /notifications from 172.16.0.45
+2025-02-20 11:30:46 Service Notification-Service fetching unread notifications for userID=567
+2025-02-20 11:30:47 Service Notification-Service response time: 90ms, status: 200
+2025-02-20 11:30:48 Service API-Gateway response sent for GET /notifications, status: 200, time: 140ms
+
+2025-02-20 11:45:50 Service API-Gateway received request: GET /logs/errors from 172.16.0.50
+2025-02-20 11:45:51 Service Logging-Service retrieving latest error logs
+2025-02-20 11:45:52 Service Logging-Service response time: 500ms, status: 200
+2025-02-20 11:45:53 Service API-Gateway response sent for GET /logs/errors, status: 200, time: 560ms
+
+2025-02-20 12:00:05 Service API-Gateway received request: GET /billing/details from 172.16.0.55
+2025-02-20 12:00:06 Service Billing-Service fetching billing details for userID=777
+2025-02-20 12:00:07 Service Billing-Service response time: 220ms, status: 200
+2025-02-20 12:00:08 Service API-Gateway response sent for GET /billing/details, status: 200, time: 270ms
+
+2025-02-20 12:15:15 Service API-Gateway received request: GET /support/tickets from 172.16.0.60
+2025-02-20 12:15:16 Service Support-Service retrieving open tickets for userID=888
+2025-02-20 12:15:17 Service Support-Service response time: 350ms, status: 200
+2025-02-20 12:15:18 Service API-Gateway response sent for GET /support/tickets, status: 200, time: 410ms
+
+2025-02-20 12:30:01 Service API-Gateway received request: GET /orders/active from 10.0.0.1
+2025-02-20 12:30:02 Service Auth-Service validating JWT token for userID=101
+2025-02-20 12:30:02 Service Auth-Service token validation successful
+2025-02-20 12:30:03 Service Order-Service fetching active orders for userID=101
+2025-02-20 12:30:04 Service Order-Service response time: 210ms, status: 200
+2025-02-20 12:30:05 Service API-Gateway response sent for GET /orders/active, status: 200, time: 260ms
+
+2025-02-20 12:35:10 Service API-Gateway received request: POST /cart/add from 10.0.0.2
+2025-02-20 12:35:11 Service Auth-Service validating JWT token for userID=102
+2025-02-20 12:35:11 Service Auth-Service token validation successful
+2025-02-20 12:35:12 Service Cart-Service adding itemID=555 to userID=102 cart
+2025-02-20 12:35:13 Service Cart-Service item added successfully, updated cartID=9999
+2025-02-20 12:35:14 Service API-Gateway response sent for POST /cart/add, status: 201, time: 400ms
+
+2025-02-20 12:40:20 Service API-Gateway received request: DELETE /cart/item/777 from 10.0.0.3
+2025-02-20 12:40:21 Service Auth-Service validating JWT token for userID=103
+2025-02-20 12:40:21 Service Auth-Service token validation failed: Expired token
+2025-02-20 12:40:22 Service API-Gateway response sent for DELETE /cart/item/777, status: 401, time: 50ms
+
+2025-02-20 12:50:30 Service API-Gateway received request: GET /recommendations from 10.0.0.4
+2025-02-20 12:50:31 Service Recommendation-Service fetching recommendations for userID=104
+2025-02-20 12:50:32 Service Recommendation-Service cache hit: Returning precomputed recommendations
+2025-02-20 12:50:33 Service API-Gateway response sent for GET /recommendations, status: 200, time: 90ms
+
+2025-02-20 12:55:45 Service API-Gateway received request: PATCH /payments/modify/888 from 10.0.0.5
+2025-02-20 12:55:46 Service Auth-Service validating JWT token for userID=105
+2025-02-20 12:55:46 Service Auth-Service token validation successful
+2025-02-20 12:55:47 Service Payment-Service processing modification request for transactionID=888
+2025-02-20 12:55:48 Service Payment-Service request failed: Transaction already processed
+2025-02-20 12:55:49 Service API-Gateway response sent for PATCH /payments/modify/888, status: 400, time: 420ms
+
+2025-02-20 13:05:00 Service API-Gateway received request: GET /server/load from 10.0.0.6
+2025-02-20 13:05:01 Service Monitoring-Service fetching server resource metrics
+2025-02-20 13:05:02 Service Monitoring-Service response: CPU 85%, Memory 92%, Disk 78%
+2025-02-20 13:05:03 Service API-Gateway response sent for GET /server/load, status: 200, time: 300ms
+
+2025-02-20 13:10:10 Service API-Gateway received request: POST /support/ticket from 10.0.0.7
+2025-02-20 13:10:11 Service Auth-Service validating JWT token for userID=106
+2025-02-20 13:10:11 Service Auth-Service token validation successful
+2025-02-20 13:10:12 Service Support-Service creating new support ticket for userID=106
+2025-02-20 13:10:13 Service Support-Service ticket created successfully, ticketID=6789
+2025-02-20 13:10:14 Service API-Gateway response sent for POST /support/ticket, status: 201, time: 350ms
+
+2025-02-20 13:20:25 Service API-Gateway received request: GET /analytics/reports from 10.0.0.8
+2025-02-20 13:20:26 Service Analytics-Service generating custom report for adminID=999
+2025-02-20 13:20:27 Service Analytics-Service response time: 800ms, status: 200
+2025-02-20 13:20:28 Service API-Gateway response sent for GET /analytics/reports, status: 200, time: 850ms
+
+2025-02-20 13:30:40 Service API-Gateway received request: DELETE /user/account from 10.0.0.9
+2025-02-20 13:30:41 Service Auth-Service validating JWT token for userID=107
+2025-02-20 13:30:41 Service Auth-Service token validation successful
+2025-02-20 13:30:42 Service User-Service account deletion request for userID=107
+2025-02-20 13:30:43 Service User-Service deletion confirmed, userID=107 marked for deactivation
+2025-02-20 13:30:44 Service API-Gateway response sent for DELETE /user/account, status: 200, time: 480ms
+
+2025-02-20 13:40:55 Service API-Gateway received request: GET /logs/security from 10.0.0.10
+2025-02-20 13:40:56 Service Logging-Service fetching recent security logs
+2025-02-20 13:40:57 Service Logging-Service response time: 400ms, status: 200
+2025-02-20 13:40:58 Service API-Gateway response sent for GET /logs/security, status: 200, time: 460ms
+
+2025-02-20 13:50:05 Service API-Gateway received request: GET /metrics/errors from 10.0.0.11
+2025-02-20 13:50:06 Service Metrics-Service aggregating recent API error rates
+2025-02-20 13:50:07 Service Metrics-Service response: 12 errors in last 60 minutes
+2025-02-20 13:50:08 Service API-Gateway response sent for GET /metrics/errors, status: 200, time: 250ms
+
+2025-02-20 14:00:15 Service API-Gateway received request: GET /cache/status from 10.0.0.12
+2025-02-20 14:00:16 Service Cache-Service fetching cache hit/miss statistics
+2025-02-20 14:00:17 Service Cache-Service response: Hit rate 89%, Miss rate 11%
+2025-02-20 14:00:18 Service API-Gateway response sent for GET /cache/status, status: 200, time: 240ms
+
+2025-02-20 14:15:01 Service API-Gateway received request: GET /dashboard from 10.0.1.1
+2025-02-20 14:15:02 Service Auth-Service validating JWT token for userID=201
+2025-02-20 14:15:02 Service Auth-Service token validation successful
+2025-02-20 14:15:03 Service Dashboard-Service retrieving summary data for userID=201
+2025-02-20 14:15:04 Service Dashboard-Service response time: 250ms, status: 200
+2025-02-20 14:15:05 Service API-Gateway response sent for GET /dashboard, status: 200, time: 300ms
+
+2025-02-20 14:20:15 Service API-Gateway received request: POST /orders from 10.0.1.2
+2025-02-20 14:20:16 Service Auth-Service validating JWT token for userID=202
+2025-02-20 14:20:16 Service Auth-Service token validation successful
+2025-02-20 14:20:17 Service Order-Service processing order for userID=202
+2025-02-20 14:20:18 Service Order-Service failed: Database timeout
+2025-02-20 14:20:19 Service API-Gateway response sent for POST /orders, status: 500, time: 500ms
+
+2025-02-20 14:25:30 Service API-Gateway received request: GET /server/metrics from 10.0.1.3
+2025-02-20 14:25:31 Service Monitoring-Service fetching system load statistics
+2025-02-20 14:25:32 Service Monitoring-Service response: CPU 92%, Memory 85%, Disk 90%
+2025-02-20 14:25:33 Service Alert-Service triggered: High CPU usage detected
+2025-02-20 14:25:34 Service API-Gateway response sent for GET /server/metrics, status: 200, time: 320ms
+
+2025-02-20 14:30:40 Service API-Gateway received request: GET /recommendations from 10.0.1.4
+2025-02-20 14:30:41 Service Recommendation-Service fetching personalized recommendations for userID=203
+2025-02-20 14:30:42 Service Recommendation-Service cache miss: Fetching from DB
+2025-02-20 14:30:43 Service Recommendation-Service response time: 450ms, status: 200
+2025-02-20 14:30:44 Service API-Gateway response sent for GET /recommendations, status: 200, time: 500ms
+
+2025-02-20 14:40:55 Service API-Gateway received request: DELETE /user/account from 10.0.1.5
+2025-02-20 14:40:56 Service Auth-Service validating JWT token for userID=204
+2025-02-20 14:40:56 Service Auth-Service token validation successful
+2025-02-20 14:40:57 Service User-Service processing account deletion for userID=204
+2025-02-20 14:40:58 Service User-Service request failed: Foreign key constraint violated
+2025-02-20 14:40:59 Service API-Gateway response sent for DELETE /user/account, status: 400, time: 450ms
+
+2025-02-20 14:50:10 Service API-Gateway received request: GET /transactions from 10.0.1.6
+2025-02-20 14:50:11 Service Auth-Service validating JWT token for userID=205
+2025-02-20 14:50:11 Service Auth-Service token validation failed: Invalid signature
+2025-02-20 14:50:12 Service API-Gateway response sent for GET /transactions, status: 403, time: 100ms
+
+2025-02-20 15:00:20 Service API-Gateway received request: GET /user/activity from 10.0.1.7
+2025-02-20 15:00:21 Service Activity-Service fetching recent actions for userID=206
+2025-02-20 15:00:22 Service Activity-Service response time: 180ms, status: 200
+2025-02-20 15:00:23 Service API-Gateway response sent for GET /user/activity, status: 200, time: 220ms
+
+2025-02-20 15:05:30 Service API-Gateway received request: GET /logs/security from 10.0.1.8
+2025-02-20 15:05:31 Service Logging-Service retrieving security events
+2025-02-20 15:05:32 Service Logging-Service alert: 5 failed login attempts detected for userID=999
+2025-02-20 15:05:33 Service API-Gateway response sent for GET /logs/security, status: 200, time: 260ms
+
+2025-02-20 15:10:45 Service API-Gateway received request: GET /cache/status from 10.0.1.9
+2025-02-20 15:10:46 Service Cache-Service checking cache health
+2025-02-20 15:10:47 Service Cache-Service response: Hit rate 92%, Miss rate 8%
+2025-02-20 15:10:48 Service API-Gateway response sent for GET /cache/status, status: 200, time: 190ms
+
+2025-02-20 15:15:55 Service API-Gateway received request: GET /api/rate-limit from 10.0.1.10
+2025-02-20 15:15:56 Service RateLimiter-Service checking API rate limits for userID=207
+2025-02-20 15:15:57 Service RateLimiter-Service response: 85% quota used
+2025-02-20 15:15:58 Service API-Gateway response sent for GET /api/rate-limit, status: 200, time: 250ms
+
+2025-02-20 15:20:05 Service API-Gateway received request: POST /users/reset-password from 10.0.1.11
+2025-02-20 15:20:06 Service Auth-Service processing password reset for userID=208
+2025-02-20 15:20:07 Service Auth-Service reset email sent successfully
+2025-02-20 15:20:08 Service API-Gateway response sent for POST /users/reset-password, status: 200, time: 320ms
+
+2025-02-20 15:30:01 Service API-Gateway received request: GET /login from 10.0.2.1
+2025-02-20 15:30:02 Service Auth-Service processing login request for userID=301
+2025-02-20 15:30:03 Service Auth-Service user authentication successful
+2025-02-20 15:30:04 Service API-Gateway response sent for GET /login, status: 200, time: 250ms
+
+2025-02-20 15:35:10 Service API-Gateway received request: GET /billing from 10.0.2.2
+2025-02-20 15:35:11 Service Billing-Service fetching invoice details for userID=302
+2025-02-20 15:35:12 Service Billing-Service request failed: Database deadlock detected
+2025-02-20 15:35:13 Service API-Gateway response sent for GET /billing, status: 500, time: 500ms
+
+2025-02-20 15:40:25 Service API-Gateway received request: GET /server/status from 10.0.2.3
+2025-02-20 15:40:26 Service Monitoring-Service fetching CPU and memory usage
+2025-02-20 15:40:27 Service Monitoring-Service alert triggered: CPU usage 97%, Memory 91%
+2025-02-20 15:40:28 Service API-Gateway response sent for GET /server/status, status: 200, time: 280ms
+
+2025-02-20 15:45:30 Service API-Gateway received request: POST /payments from 10.0.2.4
+2025-02-20 15:45:31 Service Payment-Service processing transaction for userID=303
+2025-02-20 15:45:32 Service Payment-Service API timeout: External provider not responding
+2025-02-20 15:45:33 Service API-Gateway response sent for POST /payments, status: 504, time: 1000ms
+
+2025-02-20 15:50:45 Service API-Gateway received request: GET /analytics/reports from 10.0.2.5
+2025-02-20 15:50:46 Service Analytics-Service generating reports for adminID=999
+2025-02-20 15:50:47 Service Analytics-Service anomaly detected: Unusual traffic spike
+2025-02-20 15:50:48 Service API-Gateway response sent for GET /analytics/reports, status: 200, time: 350ms
+
+2025-02-20 16:00:10 Service API-Gateway received request: GET /products from 10.0.2.6
+2025-02-20 16:00:11 Service Product-Service fetching product list
+2025-02-20 16:00:12 Service Product-Service request failed: Cache corrupted, fallback to DB
+2025-02-20 16:00:13 Service Product-Service DB response time: 700ms, status: 200
+2025-02-20 16:00:14 Service API-Gateway response sent for GET /products, status: 200, time: 900ms
+
+2025-02-20 16:05:20 Service API-Gateway received request: GET /notifications from 10.0.2.7
+2025-02-20 16:05:21 Service Notification-Service fetching alerts for userID=304
+2025-02-20 16:05:22 Service Notification-Service response: 5 unread notifications
+2025-02-20 16:05:23 Service API-Gateway response sent for GET /notifications, status: 200, time: 210ms
+
+2025-02-20 16:10:30 Service API-Gateway received request: GET /logs/errors from 10.0.2.8
+2025-02-20 16:10:31 Service Logging-Service retrieving system error logs
+2025-02-20 16:10:32 Service Logging-Service high error rate detected: 150 errors in 1 hour
+2025-02-20 16:10:33 Service API-Gateway response sent for GET /logs/errors, status: 200, time: 280ms
+
+2025-02-20 16:20:40 Service API-Gateway received request: GET /rate-limit from 10.0.2.9
+2025-02-20 16:20:41 Service RateLimiter-Service checking API quota for userID=305
+2025-02-20 16:20:42 Service RateLimiter-Service response: 99% quota used, cooldown enforced
+2025-02-20 16:20:43 Service API-Gateway response sent for GET /rate-limit, status: 429, time: 100ms
+
+2025-02-20 16:25:50 Service API-Gateway received request: GET /inventory from 10.0.2.10
+2025-02-20 16:25:51 Service Inventory-Service fetching stock levels
+2025-02-20 16:25:52 Service Inventory-Service warning: Low stock detected for productID=123
+2025-02-20 16:25:53 Service API-Gateway response sent for GET /inventory, status: 200, time: 200ms
+
+2025-02-20 16:30:05 Service API-Gateway received request: GET /user/login-attempts from 10.0.2.11
+2025-02-20 16:30:06 Service Security-Service analyzing login attempts
+2025-02-20 16:30:07 Service Security-Service alert: Possible brute force attack detected on userID=777
+2025-02-20 16:30:08 Service API-Gateway response sent for GET /user/login-attempts, status: 200, time: 270ms
+
+2025-02-20 16:35:15 Service API-Gateway received request: GET /ddos-detection from 10.0.2.12
+2025-02-20 16:35:16 Service Security-Service analyzing network traffic
+2025-02-20 16:35:17 Service Security-Service alert: 5000 requests per second detected from 192.168.1.99
+2025-02-20 16:35:18 Service API-Gateway response sent for GET /ddos-detection, status: 200, time: 320ms
+
+2025-02-20 16:40:30 Service API-Gateway received request: GET /recommendations from 10.0.2.13
+2025-02-20 16:40:31 Service Recommendation-Service processing recommendation for userID=306
+2025-02-20 16:40:32 Service Recommendation-Service deep learning model exceeded threshold, switching to fallback model
+2025-02-20 16:40:33 Service API-Gateway response sent for GET /recommendations, status: 200, time: 420ms
