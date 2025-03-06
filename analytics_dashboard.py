@@ -1,335 +1,306 @@
-import sys
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QTabWidget, 
-                           QWidget, QVBoxLayout, QPushButton, QLabel,
-                           QGridLayout, QTableWidget, QTableWidgetItem, QComboBox, QHBoxLayout)
-from PyQt5.QtChart import QChart, QChartView, QLineSeries, QBarSeries, QBarSet
-from PyQt5.QtCore import Qt, QTimer
+import dash
+from dash import dcc, html, Input, Output, callback
+import dash_bootstrap_components as dbc
+import plotly.graph_objs as go
 import clickhouse_connect
 from datetime import datetime, timedelta
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from matplotlib.figure import Figure
 import numpy as np
+import pandas as pd
 from scipy import stats
 
-class APIAnalyticsDashboard(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("API Analytics Dashboard")
-        self.setGeometry(100, 100, 1200, 800)
-        self.client = clickhouse_connect.get_client(host='localhost', username='default', password='')
-        
-        # Create main widget and layout
-        main_widget = QWidget()
-        self.setCentralWidget(main_widget)
-        layout = QVBoxLayout(main_widget)
-        
-        # Create tab widget
-        tabs = QTabWidget()
-        layout.addWidget(tabs)
-        
-        # Create tabs
-        tabs.addTab(self.create_overview_tab(), "Overview")
-        tabs.addTab(self.create_response_times_tab(), "Response Times")
-        tabs.addTab(self.create_errors_tab(), "Errors")
-        tabs.addTab(self.create_endpoints_tab(), "Endpoints")
-        
-        # Add refresh button
-        refresh_btn = QPushButton("Refresh Data")
-        refresh_btn.clicked.connect(self.refresh_all)
-        layout.addWidget(refresh_btn)
-        
-        # Set up auto-refresh timer
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.refresh_all)
-        self.timer.start(30000)  # Refresh every 30 seconds
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app.title = "API Analytics Dashboard"
 
-    def create_overview_tab(self):
-        tab = QWidget()
-        layout = QGridLayout()
-        
-        # Add statistics cards
-        self.total_requests_label = QLabel("Total Requests: Loading...")
-        self.error_rate_label = QLabel("Error Rate: Loading...")
-        self.avg_response_label = QLabel("Avg Response Time: Loading...")
-        
-        layout.addWidget(self.total_requests_label, 0, 0)
-        layout.addWidget(self.error_rate_label, 0, 1)
-        layout.addWidget(self.avg_response_label, 0, 2)
-        
-        # Add charts
-        status_chart = QChartView()
-        self.status_chart_view = status_chart
-        layout.addWidget(status_chart, 1, 0, 1, 3)
-        
-        tab.setLayout(layout)
-        return tab
+# Connect to ClickHouse
+client = clickhouse_connect.get_client(host='localhost', username='default', password='')
 
-    def create_response_times_tab(self):
-        tab = QWidget()
-        layout = QVBoxLayout()
-        
-        # Create matplotlib figure
-        fig = Figure(figsize=(12, 6))
-        canvas = FigureCanvasQTAgg(fig)
-        layout.addWidget(canvas)
-        self.response_fig = fig
-        self.response_canvas = canvas
-        
-        # Add statistics panel
-        stats_layout = QGridLayout()
-        self.p95_label = QLabel("95th Percentile: Loading...")
-        self.p99_label = QLabel("99th Percentile: Loading...")
-        self.std_dev_label = QLabel("Standard Deviation: Loading...")
-        self.trend_label = QLabel("Trend: Loading...")
-        
-        stats_layout.addWidget(self.p95_label, 0, 0)
-        stats_layout.addWidget(self.p99_label, 0, 1)
-        stats_layout.addWidget(self.std_dev_label, 1, 0)
-        stats_layout.addWidget(self.trend_label, 1, 1)
-        
-        stats_widget = QWidget()
-        stats_widget.setLayout(stats_layout)
-        layout.addWidget(stats_widget)
-        
-        # Time range selector
-        range_layout = QHBoxLayout()
-        self.time_range_combo = QComboBox()
-        self.time_range_combo.addItems(['Last Hour', 'Last Day', 'Last Week', 'All Time'])
-        self.time_range_combo.currentTextChanged.connect(self.update_response_times_chart)
-        range_layout.addWidget(QLabel("Time Range:"))
-        range_layout.addWidget(self.time_range_combo)
-        range_layout.addStretch()
-        
-        range_widget = QWidget()
-        range_widget.setLayout(range_layout)
-        layout.addWidget(range_widget)
-        
-        tab.setLayout(layout)
-        return tab
-
-    def create_errors_tab(self):
-        tab = QWidget()
-        layout = QVBoxLayout()
-        
-        # Error rate chart
-        chart_view = QChartView()
-        self.error_chart_view = chart_view
-        layout.addWidget(chart_view)
-        
-        # Error table
-        self.error_table = QTableWidget()
-        self.error_table.setColumnCount(3)
-        self.error_table.setHorizontalHeaderLabels(["Endpoint", "Error Count", "Error Rate"])
-        layout.addWidget(self.error_table)
-        
-        tab.setLayout(layout)
-        return tab
-
-    def create_endpoints_tab(self):
-        tab = QWidget()
-        layout = QVBoxLayout()
-        
-        # Endpoints stats table
-        self.endpoints_table = QTableWidget()
-        self.endpoints_table.setColumnCount(5)
-        self.endpoints_table.setHorizontalHeaderLabels([
-            "Endpoint", "Requests", "Avg Time", "Error Rate", "Last Status"
-        ])
-        layout.addWidget(self.endpoints_table)
-        
-        tab.setLayout(layout)
-        return tab
-
-    def update_overview_stats(self):
-        # Fetch basic stats
-        total_query = "SELECT count() FROM api_logs"
-        error_query = "SELECT countIf(status_code >= 400)/count()*100 FROM api_logs"
-        avg_time_query = "SELECT avg(response_time) FROM api_logs WHERE response_time IS NOT NULL"
-        
-        total = self.client.query(total_query).result_rows[0][0]
-        error_rate = self.client.query(error_query).result_rows[0][0]
-        avg_time = self.client.query(avg_time_query).result_rows[0][0]
-        
-        self.total_requests_label.setText(f"Total Requests: {total}")
-        self.error_rate_label.setText(f"Error Rate: {error_rate:.2f}%")
-        self.avg_response_label.setText(f"Avg Response Time: {avg_time:.2f}ms")
-
-    def update_response_times_chart(self):
-        # Clear the figure
-        self.response_fig.clear()
-        
-        # Get time range
-        time_range = self.time_range_combo.currentText()
-        time_clause = self.get_time_clause(time_range)
-        
-        # Fetch data - using toDateTime64 to handle microseconds
-        query = f"""
-        SELECT 
-            toDateTime(timestamp) as ts_time,
-            response_time,
-            endpoint
-        FROM api_logs 
-        WHERE response_time IS NOT NULL
-        {time_clause}
-        ORDER BY ts_time
-        """
-        
-        try:
-            result = self.client.query(query)
-            
-            if not result.result_rows or len(result.result_rows) == 0:
-                # Display "No data" message on the plot
-                ax = self.response_fig.add_subplot(111)
-                ax.text(0.5, 0.5, "No data available", horizontalalignment='center', 
-                        verticalalignment='center', transform=ax.transAxes, fontsize=14)
-                self.response_fig.tight_layout()
-                self.response_canvas.draw()
-                return
-            
-            timestamps = [row[0] for row in result.result_rows]
-            response_times = [row[1] for row in result.result_rows]
-            endpoints = [row[2] for row in result.result_rows]
-            
-            # Create subplots
-            ax1 = self.response_fig.add_subplot(211)  # Time series
-            ax2 = self.response_fig.add_subplot(212)  # Distribution
-            
-            # Plot time series
-            ax1.plot(timestamps, response_times, 'b-', alpha=0.5)
-            ax1.scatter(timestamps, response_times, c='blue', s=20, alpha=0.5)
-            
-            # Add trend line
-            if len(timestamps) > 1:  # Only add trend line if we have enough points
-                z = np.polyfit(range(len(timestamps)), response_times, 1)
-                p = np.poly1d(z)
-                trend_line = p(range(len(timestamps)))
-                ax1.plot(timestamps, trend_line, 'r--', label='Trend')
-                trend = 'Increasing' if z[0] > 0 else 'Decreasing'
-                self.trend_label.setText(f"Trend: {trend} ({abs(z[0]):.4f}ms/request)")
-            else:
-                self.trend_label.setText("Trend: Not enough data")
-            
-            ax1.set_title('Response Times Over Time')
-            ax1.set_xlabel('Timestamp')
-            ax1.set_ylabel('Response Time (ms)')
-            ax1.grid(True)
-            
-            # Plot distribution
-            ax2.hist(response_times, bins=min(50, len(response_times)), alpha=0.7, color='blue')
-            ax2.set_title('Response Time Distribution')
-            ax2.set_xlabel('Response Time (ms)')
-            ax2.set_ylabel('Frequency')
-            ax2.grid(True)
-            
-            # Calculate statistics
-            if response_times:
-                p95 = np.percentile(response_times, 95)
-                p99 = np.percentile(response_times, 99)
-                std_dev = np.std(response_times)
+app.layout = dbc.Container([
+    html.H1("API Analytics Dashboard", className="mb-4"),
+    
+    dcc.Interval(id='refresh-interval', interval=30*1000, n_intervals=0),
+    
+    dcc.Tabs([
+        dcc.Tab(label="Overview", children=[
+            dbc.Row([
+                dbc.Col(dbc.Card([
+                    dbc.CardBody([
+                        html.H4("Total Requests", className="card-title"),
+                        html.P(id="total-requests", className="card-text")
+                    ])
+                ]), width=4),
                 
-                # Update statistics labels
-                self.p95_label.setText(f"95th Percentile: {p95:.2f}ms")
-                self.p99_label.setText(f"99th Percentile: {p99:.2f}ms")
-                self.std_dev_label.setText(f"Standard Deviation: {std_dev:.2f}ms")
-            else:
-                self.p95_label.setText("95th Percentile: N/A")
-                self.p99_label.setText("99th Percentile: N/A")
-                self.std_dev_label.setText("Standard Deviation: N/A")
-            
-            # Adjust layout and display
-            self.response_fig.tight_layout()
-            self.response_canvas.draw()
-            
-        except Exception as e:
-            print(f"Error updating response times chart: {str(e)}")
-            # Show error in the plot
-            self.response_fig.clear()
-            ax = self.response_fig.add_subplot(111)
-            ax.text(0.5, 0.5, f"Error: {str(e)}", horizontalalignment='center', 
-                    verticalalignment='center', transform=ax.transAxes, fontsize=12,
-                    wrap=True)
-            self.response_fig.tight_layout()
-            self.response_canvas.draw()
+                dbc.Col(dbc.Card([
+                    dbc.CardBody([
+                        html.H4("Error Rate", className="card-title"),
+                        html.P(id="error-rate", className="card-text")
+                    ])
+                ]), width=4),
+                
+                dbc.Col(dbc.Card([
+                    dbc.CardBody([
+                        html.H4("Avg Response Time", className="card-title"),
+                        html.P(id="avg-response", className="card-text")
+                    ])
+                ]), width=4),
+            ]),
+        ]),
+        
+        dcc.Tab(label="Response Times", children=[
+            html.Div([
+                dbc.Row([
+                    dbc.Col([
+                        html.Label("Time Range:"),
+                        dcc.Dropdown(
+                            id='time-range',
+                            options=[
+                                {'label': 'Last Hour', 'value': 'Last Hour'},
+                                {'label': 'Last Day', 'value': 'Last Day'},
+                                {'label': 'Last Week', 'value': 'Last Week'},
+                                {'label': 'All Time', 'value': 'All Time'}
+                            ],
+                            value='Last Hour',
+                            clearable=False
+                        )
+                    ], width=3)
+                ]),
+                
+                dbc.Row([
+                    dbc.Col(dcc.Graph(id='response-times-plot'), width=12)
+                ]),
+                
+                dbc.Row([
+                    dbc.Col(dcc.Graph(id='response-distribution'), width=6),
+                    dbc.Col([
+                        html.Div([
+                            html.H5("Statistics"),
+                            html.P(id="p95-stat"),
+                            html.P(id="p99-stat"),
+                            html.P(id="std-dev-stat"),
+                            html.P(id="trend-stat")
+                        ], className="mt-4 p-3 border rounded")
+                    ], width=6)
+                ])
+            ])
+        ]),
+        
+        dcc.Tab(label="Errors", children=[
+            dbc.Row([
+                dbc.Col(dcc.Graph(id='error-codes-chart'), width=6),
+                dbc.Col(html.Div(id='error-table'), width=6)
+            ])
+        ]),
+        
+        dcc.Tab(label="Endpoints", children=[
+            html.Div(id='endpoints-table')
+        ])
+    ])
+], fluid=True)
 
-    def get_time_clause(self, time_range):
-        now = datetime.now()
-        if time_range == 'Last Hour':
-            start_time = now - timedelta(hours=1)
-        elif time_range == 'Last Day':
-            start_time = now - timedelta(days=1)
-        elif time_range == 'Last Week':
-            start_time = now - timedelta(weeks=1)
-        else:  # All Time
-            return ""
-        
-        # Format the date to avoid microsecond issues
-        formatted_date = start_time.strftime('%Y-%m-%d %H:%M:%S')
-        return f"AND toDateTime(timestamp) >= toDateTime('{formatted_date}')"
+def get_time_clause(time_range):
+    now = datetime.now()
+    if time_range == 'Last Hour':
+        start_time = now - timedelta(hours=1)
+    elif time_range == 'Last Day':
+        start_time = now - timedelta(days=1)
+    elif time_range == 'Last Week':
+        start_time = now - timedelta(weeks=1)
+    else:
+        return ""
+    return f"AND timestamp >= '{start_time.strftime('%Y-%m-%d %H:%M:%S')}'"
 
-    def update_error_chart(self):
-        query = """
-        SELECT 
-            status_code,
-            count() as count
-        FROM api_logs 
-        WHERE status_code IS NOT NULL
-        GROUP BY status_code
-        ORDER BY status_code
-        """
-        
-        result = self.client.query(query)
-        
-        bar_set = QBarSet("Status Codes")
-        labels = []
-        for row in result.result_rows:
-            bar_set.append(row[1])
-            labels.append(str(row[0]))
-        
-        series = QBarSeries()
-        series.append(bar_set)
-        
-        chart = QChart()
-        chart.addSeries(series)
-        chart.setTitle("Status Code Distribution")
-        self.error_chart_view.setChart(chart)
+@app.callback(
+    [Output('total-requests', 'children'),
+     Output('error-rate', 'children'),
+     Output('avg-response', 'children')],
+    Input('refresh-interval', 'n_intervals')
+)
+def update_overview(_):
+    total = client.query("SELECT count() FROM api_logs").result_rows[0][0]
+    error_rate = client.query("SELECT countIf(status_code >= 400)/count()*100 FROM api_logs").result_rows[0][0]
+    avg_time = client.query("SELECT avg(response_time) FROM api_logs WHERE response_time IS NOT NULL").result_rows[0][0]
+    return f"{total}", f"{error_rate:.2f}%", f"{avg_time:.2f}ms"
 
-    def refresh_all(self):
-        self.update_overview_stats()
-        self.update_response_times_chart()
-        self.update_error_chart()
-        self.update_tables()
-
-    def update_tables(self):
-        # Update endpoints table
-        endpoint_query = """
-        SELECT 
-            endpoint,
-            count() as requests,
-            avg(response_time) as avg_time,
-            countIf(status_code >= 400)/count()*100 as error_rate,
-            argMax(status_code, timestamp) as last_status
-        FROM api_logs 
-        WHERE endpoint IS NOT NULL
-        GROUP BY endpoint
-        ORDER BY requests DESC
-        """
+@app.callback(
+    [Output('response-times-plot', 'figure'),
+     Output('response-distribution', 'figure'),
+     Output('p95-stat', 'children'),
+     Output('p99-stat', 'children'),
+     Output('std-dev-stat', 'children'),
+     Output('trend-stat', 'children')],
+    [Input('time-range', 'value'),
+     Input('refresh-interval', 'n_intervals')]
+)
+def update_response_times(time_range, _):
+    time_clause = get_time_clause(time_range)
+    query = f"""
+    SELECT 
+        timestamp,
+        response_time,
+        endpoint
+    FROM api_logs 
+    WHERE response_time IS NOT NULL
+    {time_clause}
+    ORDER BY timestamp
+    """
+    
+    result = client.query(query)
+    df = pd.DataFrame(result.result_rows, columns=['timestamp', 'response_time', 'endpoint'])
+    
+    # Create figures
+    time_fig = go.Figure()
+    dist_fig = go.Figure()
+    stats_outputs = ["N/A"] * 4
+    
+    if not df.empty:
+        # Time series plot
+        time_fig.add_trace(go.Scatter(
+            x=df['timestamp'],
+            y=df['response_time'],
+            mode='lines+markers',
+            name='Response Time'
+        ))
         
-        result = self.client.query(endpoint_query)
-        self.endpoints_table.setRowCount(len(result.result_rows))
+        # Trend line
+        if len(df) > 1:
+            z = np.polyfit(range(len(df)), df['response_time'], 1)
+            p = np.poly1d(z)
+            trend = 'Increasing' if z[0] > 0 else 'Decreasing'
+            trend_text = f"{trend} ({abs(z[0]):.4f}ms/request)"
+            time_fig.add_trace(go.Scatter(
+                x=df['timestamp'],
+                y=p(range(len(df))),
+                mode='lines',
+                name='Trend',
+                line=dict(color='red', dash='dash')
+            ))
+        else:
+            trend_text = "Not enough data"
         
-        for i, row in enumerate(result.result_rows):
-            self.endpoints_table.setItem(i, 0, QTableWidgetItem(str(row[0])))
-            self.endpoints_table.setItem(i, 1, QTableWidgetItem(str(row[1])))
-            self.endpoints_table.setItem(i, 2, QTableWidgetItem(f"{row[2]:.2f}ms"))
-            self.endpoints_table.setItem(i, 3, QTableWidgetItem(f"{row[3]:.2f}%"))
-            self.endpoints_table.setItem(i, 4, QTableWidgetItem(str(row[4])))
+        # Distribution plot
+        dist_fig.add_trace(go.Histogram(
+            x=df['response_time'],
+            nbinsx=50,
+            marker_color='blue'
+        ))
+        
+        # Calculate statistics
+        p95 = np.percentile(df['response_time'], 95)
+        p99 = np.percentile(df['response_time'], 99)
+        std_dev = np.std(df['response_time'])
+        stats_outputs = [
+            f"95th Percentile: {p95:.2f}ms",
+            f"99th Percentile: {p99:.2f}ms",
+            f"Standard Deviation: {std_dev:.2f}ms",
+            f"Trend: {trend_text}"
+        ]
+    
+    time_fig.update_layout(
+        title='Response Times Over Time',
+        xaxis_title='Timestamp',
+        yaxis_title='Response Time (ms)'
+    )
+    
+    dist_fig.update_layout(
+        title='Response Time Distribution',
+        xaxis_title='Response Time (ms)',
+        yaxis_title='Frequency'
+    )
+    
+    return time_fig, dist_fig, *stats_outputs
 
-def main():
-    app = QApplication(sys.argv)
-    dashboard = APIAnalyticsDashboard()
-    dashboard.show()
-    dashboard.refresh_all()
-    sys.exit(app.exec_())
+@app.callback(
+    [Output('error-codes-chart', 'figure'),
+     Output('error-table', 'children')],
+    Input('refresh-interval', 'n_intervals')
+)
+def update_errors(_):
+    query = """
+    SELECT 
+        status_code,
+        count() as count,
+        endpoint
+    FROM api_logs 
+    WHERE status_code IS NOT NULL AND status_code >= 400
+    GROUP BY status_code, endpoint
+    ORDER BY count DESC
+    """
+    
+    result = client.query(query)
+    df = pd.DataFrame(result.result_rows, columns=['status_code', 'count', 'endpoint'])
+    
+    error_fig = go.Figure()
+    table = html.Div("No errors found")
+    
+    if not df.empty:
+        error_fig.add_trace(go.Bar(
+            x=df['status_code'].astype(str),
+            y=df['count'],
+            name='Error Count'
+        ))
+        
+        table = dbc.Table([
+            html.Thead(html.Tr([
+                html.Th("Status Code"), 
+                html.Th("Count"), 
+                html.Th("Endpoint")
+            ])),
+            html.Tbody([
+                html.Tr([
+                    html.Td(row['status_code']),
+                    html.Td(row['count']),
+                    html.Td(row['endpoint'])
+                ]) for _, row in df.iterrows()
+            ])
+        ], bordered=True, striped=True)
+    
+    error_fig.update_layout(
+        title='Error Status Codes Distribution',
+        xaxis_title='Status Code',
+        yaxis_title='Count'
+    )
+    
+    return error_fig, table
+
+@app.callback(
+    Output('endpoints-table', 'children'),
+    Input('refresh-interval', 'n_intervals')
+)
+def update_endpoints(_):
+    query = """
+    SELECT 
+        endpoint,
+        count() as requests,
+        avg(response_time) as avg_time,
+        countIf(status_code >= 400)/count()*100 as error_rate,
+        argMax(status_code, timestamp) as last_status
+    FROM api_logs 
+    WHERE endpoint IS NOT NULL
+    GROUP BY endpoint
+    ORDER BY requests DESC
+    """
+    
+    result = client.query(query)
+    df = pd.DataFrame(result.result_rows, 
+                    columns=['Endpoint', 'Requests', 'Avg Time', 'Error Rate', 'Last Status'])
+    
+    return dbc.Table([
+        html.Thead(html.Tr([
+            html.Th("Endpoint"),
+            html.Th("Requests"),
+            html.Th("Avg Time"),
+            html.Th("Error Rate"),
+            html.Th("Last Status")
+        ])),
+        html.Tbody([
+            html.Tr([
+                html.Td(row['Endpoint']),
+                html.Td(f"{row['Requests']}"),
+                html.Td(f"{row['Avg Time']:.2f}ms"),
+                html.Td(f"{row['Error Rate']:.2f}%"),
+                html.Td(row['Last Status'])
+            ]) for _, row in df.iterrows()
+        ])
+    ], bordered=True, striped=True, hover=True)
 
 if __name__ == '__main__':
-    main()
+    app.run_server(debug=True)
