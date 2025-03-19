@@ -1,6 +1,6 @@
 /* Base styling */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Roboto', sans-serif; /* Updated font */
     margin: 0;
     padding: 0;
     background-color: #f5f7fa;
@@ -390,4 +390,107 @@ body {
     .filter-dropdown-inline {
         width: 100%;
     }
+}
+
+/* Font Import (Example with Roboto) */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+/* Light/Dark mode variables */
+:root {
+    --background-light: #ffffff;
+    --text-light: #000000;
+    --card-light-bg: #f7f7f7;
+    --button-light-bg: #ebebeb;
+    --button-light-hover-bg: #dedede;
+
+    --background-dark: #1e1e1e;
+    --text-dark: #f1f1f1;
+    --card-dark-bg: #2a2a2a;
+    --button-dark-bg: #333333;
+    --button-dark-hover-bg: #444444;
+
+    --transition-speed: 0.3s;
+}
+
+/* Light Mode */
+.light-mode {
+    background-color: var(--background-light);
+    color: var(--text-light);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.light-mode .card {
+    background-color: var(--card-light-bg);
+}
+
+.light-mode button {
+    background-color: var(--button-light-bg);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.light-mode button:hover {
+    background-color: var(--button-light-hover-bg);
+}
+
+/* Dark Mode */
+.dark-mode {
+    background-color: var(--background-dark);
+    color: var(--text-dark);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.dark-mode .card {
+    background-color: var(--card-dark-bg);
+}
+
+.dark-mode button {
+    background-color: var(--button-dark-bg);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.dark-mode button:hover {
+    background-color: var(--button-dark-hover-bg);
+}
+
+/* Theme toggle button */
+.theme-toggle-button {
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-left: auto;
+    margin-right: 0;
+}
+
+/* Sidebar (Collapsible) */
+.sidebar {
+    width: 250px;
+    background-color: var(--background-dark);
+    overflow: hidden;
+    transition: width var(--transition-speed);
+}
+
+.sidebar.collapsed {
+    width: 60px;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    color: var(--text-dark);
+    text-decoration: none;
+    transition: background-color var(--transition-speed);
+}
+
+.sidebar a:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Table hover effects */
+.dash-table-container .dash-table .dash-cell {
+    transition: background-color 0.2s;
+}
+.dash-table-container .dash-table .dash-cell:hover {
+    background-color: rgba(0,0,0,0.05);
 }

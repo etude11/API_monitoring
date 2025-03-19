@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 from datetime import datetime, timedelta
+from dash.exceptions import PreventUpdate
 
 def register_callbacks(app, mock_data):
     # Convert to DataFrame for easier manipulation
@@ -350,3 +351,20 @@ def register_callbacks(app, mock_data):
         )
         
         return alerts_status_fig
+
+    @app.callback(
+        Output("theme-store", "data"),
+        Input("theme-toggle-button", "n_clicks"),
+        State("theme-store", "data")
+    )
+    def update_theme(n_clicks, current_theme):
+        if n_clicks is None:
+            raise PreventUpdate
+        return "dark" if current_theme == "light" else "light"
+
+    @app.callback(
+        Output("app-container", "className"),
+        Input("theme-store", "data")
+    )
+    def apply_theme(theme):
+        return theme + "-mode"

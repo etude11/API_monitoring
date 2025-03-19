@@ -12,6 +12,11 @@ def create_navbar():
                 className="logo-link"
             ),
             html.H3("API Monitoring Dashboard", className="navbar-title"),
+            html.Button(
+                "Toggle Theme",
+                id="theme-toggle-button",
+                className="theme-toggle-button"
+            ),
             html.Div(
                 className="nav-links",
                 children=[

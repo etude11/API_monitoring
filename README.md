@@ -51,8 +51,6 @@ This dashboard is currently using mock data. To connect to real data sources:
 
 ## Future Enhancements
 
-- Real-time data streaming
 - PDF report generation
 - Custom alert thresholds
 - More advanced analytics features
-- Integration with monitoring services

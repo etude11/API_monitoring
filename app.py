@@ -34,12 +34,14 @@ app.title = "API Monitoring Dashboard"
 
 # App layout with navigation
 app.layout = html.Div(
-    [
+    id="app-container",
+    className="app-container light-mode",
+    children=[
+        dcc.Store(id="theme-store", data="light"),
         dcc.Location(id="url", refresh=False),
         create_navbar(),
         html.Div(id="page-content", className="content"),
     ],
-    className="app-container",
 )
 
 # Callback to render different pages based on URL
